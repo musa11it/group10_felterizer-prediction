@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fertilizer Prediction</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Fertilizer Prediction</h1>
+        <form id="fertilizer-form">
+            <div class="form-group">
+                <label>Moisture</label>
+                <input type="number" step="0.01" id="Moisture" required>
+            </div>
+
+            <div class="form-group">
+                <label>Temperature</label>
+                <input type="number" step="0.01" id="Temperature" required>
+            </div>
+
+            <div class="form-group">
+                <label>EC</label>
+                <input type="number" step="0.01" id="EC" required>
+            </div>
+
+            <div class="form-group">
+                <label>pH</label>
+                <input type="number" step="0.01" id="pH" required>
+            </div>
+
+            <div class="form-group">
+                <label>N</label>
+                <input type="number" step="0.01" id="N" required>
+            </div>
+
+            <div class="form-group">
+                <label>P</label>
+                <input type="number" step="0.01" id="P" required>
+            </div>
+
+            <div class="form-group">
+                <label>K</label>
+                <input type="number" step="0.01" id="K" required>
+            </div>
+
+            <button type="submit">Predict Fertilizer</button>
+        </form>
+
+        <div id="result" class="result"></div>
+        <div id="error" class="error"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById("fertilizer-form");
+        const resultDiv = document.getElementById("result");
+        const errorDiv = document.getElementById("error");
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            resultDiv.textContent = "";
+            errorDiv.textContent = "";
+
+            const payload = {
+                Moisture: document.getElementById("Moisture").value,
+                Temperature: document.getElementById("Temperature").value,
+                EC: document.getElementById("EC").value,
+                pH: document.getElementById("pH").value,
+                N: document.getElementById("N").value,
+                P: document.getElementById("P").value,
+                K: document.getElementById("K").value
+            };
+
+            try {
+                const response = await fetch("/predict", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    errorDiv.textContent = data.error || "Something went wrong.";
+                    return;
+                }
+
+                resultDiv.textContent = "Recommended Fertilizer: " + data.prediction;
+            } catch (err) {
+                errorDiv.textContent = "Error contacting server.";
+            }
+        });
+    </script>
+</body>
+</html>
